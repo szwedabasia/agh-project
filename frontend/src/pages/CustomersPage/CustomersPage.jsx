@@ -5,7 +5,21 @@ import { Columns } from "./components/Columns";
 import { UserNav } from "./components/UserNav";
 import { navigationLinks } from "../../config/navigationLinks";
 
+import { useState, useEffect } from "react";
+
 export const CustomersPage = () => {
+  const [customersData, setCustomersData] = useState([]);
+
+  const fetchCustomersData = () => {
+    fetch("http://127.0.0.1:8000/customers")
+      .then((res) => res.json())
+      .then((data) => setCustomersData(data));
+  };
+
+  useEffect(() => {
+    fetchCustomersData();
+  }, []);
+
   return (
     <div className="hidden flex-col md:flex">
       <div className="border-b">
@@ -21,17 +35,28 @@ export const CustomersPage = () => {
           <h2 className="text-3xl font-bold tracking-tight">Customers</h2>
         </div>
         <div className="hidden h-full flex-1 flex-col space-y-8 md:flex">
-          <DataTable
-            data={[
-              {
-                id: 1,
-                fullname: "Test",
-                email: "test@example.com",
-                phoneNumber: "000-000-000",
-              },
-            ]}
-            columns={Columns}
-          />
+        <ul className="customersList">
+            {customersData.map((item) => (
+              <li key={item.id}>
+                <p>
+                  <strong>Name: </strong>
+                  {item.name}
+                </p>
+                <p>
+                  <strong>Surname: </strong>
+                  {item.surname}
+                </p>
+                <p>
+                  <strong>Email: </strong>
+                  {item.email}
+                </p>
+                <p>
+                  <strong>Phone number: </strong>
+                  {item.phone_number}
+                </p>
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
     </div>

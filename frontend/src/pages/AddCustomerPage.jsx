@@ -1,8 +1,54 @@
 import { MainNav } from "@/components/MainNav";
 import { navigationLinks } from "../config/navigationLinks";
 import { UserNav } from "./CustomersPage/components/UserNav";
+import { useState } from "react";
 
 export const AddCustomerPage = () => {
+  const [name, setName] = useState("");
+  const [surname, setSurname] = useState("");
+  const [email, setEmail] = useState("");
+
+  const nameHandler = (event) => {
+    setName(event.target.value);
+  };
+
+  const surnameHandler = (event) => {
+    setSurname(event.target.value);
+  };
+  const emailHandler = (event) => {
+    setEmail(event.target.value);
+  };
+
+  const submitDataHandler = async (e) => {
+    e.preventDefault();
+    if (name === "") return;
+    if (email === "") return;
+
+    const customerData = {
+      name: name,
+      surname: surname,
+      email: email,
+    };
+
+    const response = fetch("http://127.0.0.1:8000/customers", {
+      method: "POST",
+      body: JSON.stringify(customerData),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    console.log(response);
+
+    if (!response.ok) {
+      setResMessage("incorrect data");
+      throw new Error(response.message || "incorrect data");
+    }
+
+    setName("");
+    setSurname("");
+    setEmail("");
+  };
   return (
     <div className="hidden flex-col md:flex">
       <div className="border-b">
@@ -19,6 +65,12 @@ export const AddCustomerPage = () => {
         </div>
         <div className="hidden h-full flex-1 flex-col space-y-8 md:flex"></div>
       </div>
+      <form onSubmit={submitDataHandler} className="addCustomer">
+        <input onChange={nameHandler} value={name} type="text" placeholder="Name"></input>
+        <input onChange={surnameHandler} value={surname} type="text" placeholder="Surname"></input>
+        <input onChange={emailHandler} value={email} type="text" placeholder="Email"></input>
+        <button type="submit">Add</button>
+      </form>
     </div>
   );
 };
