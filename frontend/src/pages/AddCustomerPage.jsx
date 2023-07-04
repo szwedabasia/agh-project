@@ -7,6 +7,8 @@ export const AddCustomerPage = () => {
   const [name, setName] = useState("");
   const [surname, setSurname] = useState("");
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+
 
   const nameHandler = (event) => {
     setName(event.target.value);
@@ -18,36 +20,41 @@ export const AddCustomerPage = () => {
   const emailHandler = (event) => {
     setEmail(event.target.value);
   };
+  const phoneHandler = (event) => {
+    setPhone(event.target.value);
+  };
 
   const submitDataHandler = async (e) => {
     e.preventDefault();
-    if (name === "") return;
-    if (email === "") return;
+    if (name === "" | phone === "" | email === "" | surname === "") throw new Error('Fields may not be empty');
 
     const customerData = {
       name: name,
       surname: surname,
       email: email,
+      phone_number: phone,
     };
 
-    const response = fetch("http://127.0.0.1:8000/customers", {
+    await fetch("http://127.0.0.1:8000/customers", {
       method: "POST",
       body: JSON.stringify(customerData),
       headers: {
         "Content-Type": "application/json",
       },
-    });
-
-    console.log(response);
-
-    if (!response.ok) {
-      setResMessage("incorrect data");
-      throw new Error(response.message || "incorrect data");
-    }
-
+    },
+    ).then(response => {
+      if ( response.status != 201 ) {
+        response.json().then(message => {
+          throw new Error(message);
+        })
+    }else{
     setName("");
     setSurname("");
     setEmail("");
+    setPhone("")
+    }
+    })
+
   };
   return (
     <div className="hidden flex-col md:flex">
@@ -69,7 +76,8 @@ export const AddCustomerPage = () => {
         <input onChange={nameHandler} value={name} type="text" placeholder="Name"></input>
         <input onChange={surnameHandler} value={surname} type="text" placeholder="Surname"></input>
         <input onChange={emailHandler} value={email} type="text" placeholder="Email"></input>
-        <button type="submit">Add</button>
+        <input onChange={phoneHandler} value={phone} type="text" placeholder="Phone"></input>
+        <button type="submit" onSubmit={submitDataHandler}>Add</button>
       </form>
     </div>
   );
